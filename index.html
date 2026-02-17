@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SDÜ Matematik Oryantiringi | Zekanı Doğaya Taşı</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Supabase JS Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap');
+        
+        :root {
+            --sdu-red: #9b1c31;
+            --sdu-red-hover: #7a1525;
+            --glass: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.08);
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #020617;
+            color: #f8fafc;
+            overflow-x: hidden;
+        }
+
+        .mesh-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
+            background: radial-gradient(circle at 10% 10%, rgba(155, 28, 49, 0.2) 0%, transparent 40%),
+                        radial-gradient(circle at 90% 90%, rgba(30, 58, 138, 0.2) 0%, transparent 40%),
+                        radial-gradient(circle at 50% 50%, #020617 0%, #020617 100%);
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.5s ease;
+        }
+
+        .form-input {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 0.85rem 1rem;
+            border-radius: 1rem;
+            width: 100%;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--sdu-red);
+            background: rgba(255, 255, 255, 0.05);
+            box-shadow: 0 0 20px rgba(155, 28, 49, 0.15);
+        }
+
+        @keyframes logo-glow {
+            0%, 100% { filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.2)); }
+            50% { filter: drop-shadow(0 0 30px rgba(255, 255, 255, 0.7)); }
+        }
+        .logo-static-glow { animation: logo-glow 3s infinite ease-in-out; }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.8s cubic-bezier(0.2, 1, 0.3, 1);
+        }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+
+        #progress {
+            position: fixed;
+            top: 0; left: 0; height: 3px;
+            background: linear-gradient(90deg, var(--sdu-red), #e11d48);
+            z-index: 200; width: 0%;
+        }
+
+        .member-card {
+            border-left: 4px solid #1e293b;
+            padding-left: 1.5rem;
+            margin-bottom: 2.5rem;
+            animation: slideIn 0.4s ease-out;
+        }
+        .member-card.leader { border-left-color: var(--sdu-red); }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        #notification {
+            position: fixed;
+            top: 1.5rem; right: 1.5rem; z-index: 1000;
+            transform: translateX(120%);
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        #notification.show { transform: translateX(0); }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: var(--sdu-red); border-radius: 10px; }
+    </style>
+</head>
+<body class="overflow-x-hidden">
+
+    <div id="progress"></div>
+    <div class="mesh-bg"></div>
+
+    <!-- Bildirim Sistemi -->
+    <div id="notification" class="glass p-5 rounded-2xl border-l-4 min-w-[320px] shadow-2xl">
+        <div class="flex items-start gap-4">
+            <div id="notif-icon" class="p-2 rounded-xl"></div>
+            <div>
+                <h4 id="notif-title" class="font-bold text-sm uppercase tracking-wider text-white"></h4>
+                <p id="notif-msg" class="text-xs text-slate-400 mt-1 leading-relaxed"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Yukarı Dön Butonu -->
+    <button id="backToTop" onclick="scrollToTop()" class="fixed bottom-6 right-6 p-4 bg-[#9b1c31] text-white rounded-2xl shadow-2xl z-[150] transition-all scale-0 hover:scale-110 active:scale-95">
+        <i data-lucide="arrow-up" class="w-5 h-5"></i>
+    </button>
+
+    <!-- HERO BÖLÜMÜ -->
+    <section class="relative min-h-screen flex flex-col items-center justify-center px-6 text-center py-8">
+        <div class="mb-6 reveal active">
+            <img src="https://r.resimlink.com/p5fEz.png" alt="SDÜ Matematik" class="w-40 md:w-56 logo-static-glow">
+        </div>
+
+        <div class="reveal active" style="transition-delay: 0.1s">
+            <div class="inline-block px-4 py-1 rounded-full glass border border-white/10 mb-6">
+                <span class="text-[9px] md:text-[10px] font-bold tracking-[0.4em] uppercase text-red-400">DOĞAYI MATEMATİKLE KEŞFET</span>
+            </div>
+
+            <h1 class="text-4xl md:text-8xl font-black mb-6 leading-none tracking-tighter text-white">
+                ORYANTİRİNG <br> 
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-red-500 via-rose-500 to-amber-500 text-transparent">
+                    YARIŞMASI
+                </span>
+            </h1>
+
+            <p class="text-base md:text-xl text-slate-400 max-w-2xl mx-auto mb-8 font-medium leading-relaxed italic">
+                Süleyman Demirel Üniversitesi İlköğretim Matematik Öğretmenliği <br class="hidden md:block text-slate-400"> analitik zekayı doğanın kalbine taşıyor.
+            </p>
+
+            <div class="flex flex-col items-center gap-6">
+                <a href="https://drive.google.com/file/d/1qJglHC2HL7pPERESImYu9lY_x01f2QkC/view?usp=sharing" target="_blank" 
+                   class="w-full max-w-sm px-8 py-5 bg-[#9b1c31] text-white rounded-2xl font-black text-sm uppercase tracking-[0.2em] flex items-center justify-center gap-3 transition-all hover:bg-red-700 shadow-lg group">
+                    <i data-lucide="file-text" class="w-5 h-5 group-hover:scale-110 transition-transform"></i>
+                    Yarışmacı Yönergesi'ni İndir
+                </a>
+
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                    <a href="#kayit" class="w-full sm:w-auto px-10 py-4 bg-white text-black rounded-xl font-black text-sm uppercase tracking-widest hover:bg-slate-200 transition-all shadow-xl">
+                        ŞİMDİ KAYDOL
+                    </a>
+                    <a href="#mantik" class="w-full sm:w-auto px-10 py-4 glass border border-white/10 text-white rounded-xl font-bold text-sm uppercase tracking-widest hover:bg-white/5 transition-all">
+                        NASIL OYNANIR?
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- MANTIK BÖLÜMÜ -->
+    <section id="mantik" class="py-24 px-6">
+        <div class="max-w-6xl mx-auto">
+            <div class="grid lg:grid-cols-2 gap-12 items-start">
+                
+                <div class="reveal space-y-6">
+                    <h2 class="text-3xl md:text-5xl font-black tracking-tighter uppercase text-white">
+                        DOĞA <span class="text-[#9b1c31]">KEŞFEDEREK ÖĞRENİLİR.</span>
+                    </h2>
+                    
+                    <div class="space-y-4">
+                        <div class="flex items-center space-x-4 p-5 glass rounded-2xl border-l-4 border-red-600">
+                            <i data-lucide="compass" class="w-6 h-6 text-red-500 shrink-0"></i>
+                            <p class="text-slate-400 text-sm italic">Dijital haritadaki işaretçileri takip ederek koordinatları deşifre edin.</p>
+                        </div>
+                        <div class="flex items-center space-x-4 p-5 glass rounded-2xl border-l-4 border-blue-600">
+                            <i data-lucide="binary" class="w-6 h-6 text-blue-500 shrink-0"></i>
+                            <p class="text-slate-400 text-sm italic">Her noktadaki bilmeceleri çözerek bir sonraki hedefe kapı açın.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-1 gap-4">
+                    <div class="reveal glass p-6 rounded-2xl border-b-2 border-yellow-500 flex items-center lg:block" style="transition-delay: 0.1s">
+                        <i data-lucide="focus" class="w-6 h-6 mb-0 lg:mb-4 mr-4 lg:mr-0 text-yellow-500"></i>
+                        <h3 class="text-sm font-black uppercase text-white tracking-widest">ODAK</h3>
+                    </div>
+                    <div class="reveal glass p-6 rounded-2xl border-b-2 border-blue-500 flex items-center lg:block" style="transition-delay: 0.2s">
+                        <i data-lucide="gauge" class="w-6 h-6 mb-0 lg:mb-4 mr-4 lg:mr-0 text-blue-500"></i>
+                        <h3 class="text-sm font-black uppercase text-white tracking-widest">HIZ</h3>
+                    </div>
+                    <div class="reveal glass p-6 rounded-2xl border-b-2 border-red-500 flex items-center lg:block" style="transition-delay: 0.3s">
+                        <i data-lucide="cpu" class="w-6 h-6 mb-0 lg:mb-4 mr-4 lg:mr-0 text-red-500"></i>
+                        <h3 class="text-sm font-black uppercase text-white tracking-widest">ZEKA</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- KAYIT BÖLÜMÜ -->
+    <section id="kayit" class="py-24 px-6 bg-black/40">
+        <div class="max-w-4xl mx-auto">
+            <div class="text-center mb-16 reveal">
+                <h2 class="text-4xl md:text-7xl font-black tracking-tighter mb-4 uppercase text-white">BAŞVURU <span class="text-[#9b1c31]">PANELİ</span></h2>
+                <p class="text-slate-500 text-[10px] font-bold uppercase tracking-[0.4em] italic">Takımınızı Kaydedin</p>
+            </div>
+
+            <form id="regForm" class="reveal glass p-8 md:p-14 rounded-[3rem] shadow-3xl border border-white/5 space-y-12">
+                
+                <div class="space-y-6">
+                    <div class="flex items-center gap-3">
+                        <div class="bg-red-500/10 p-3 rounded-xl text-red-500"><i data-lucide="flag" class="w-6 h-6"></i></div>
+                        <h2 class="text-2xl font-black uppercase tracking-tight text-white">TAKIM <span class="text-red-500">ADI</span></h2>
+                    </div>
+                    <div class="space-y-3">
+                        <label class="block text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 ml-1">EKİP İSMİ</label>
+                        <input type="text" name="teamName" required placeholder="Örn: Newton'ın Takımı" class="form-input text-xl font-bold">
+                    </div>
+                </div>
+
+                <div id="membersWrapper" class="space-y-12">
+                    <!-- Başvuru Yapan / Lider -->
+                    <div class="member-card leader reveal active" data-index="0">
+                        <div class="flex items-center gap-3 mb-8">
+                            <div class="bg-red-500 p-2 rounded-lg text-white shadow-[0_0_15px_rgba(155,28,49,0.4)]"><i data-lucide="crown" class="w-4 h-4"></i></div>
+                            <h3 class="text-lg font-black uppercase tracking-wider text-white">EKİP LİDERİ</h3>
+                        </div>
+                        <div class="grid md:grid-cols-2 gap-5">
+                            <input type="text" name="m0_name" required placeholder="Ad Soyad" class="form-input">
+                            <input type="email" name="m0_email" required placeholder="Email Adresi" class="form-input">
+                            <input type="text" name="m0_class" required placeholder="Sınıf" class="form-input">
+                            <input type="text" name="m0_dept" required placeholder="Bölüm" class="form-input">
+                            <input type="tel" name="m0_phone" required placeholder="Telefon Numarası" class="form-input md:col-span-2">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Alt Kontroller -->
+                <div class="pt-10 border-t border-white/5 flex flex-col md:flex-row gap-5 items-center justify-between">
+                    <div class="flex items-center gap-4">
+                        <button type="button" id="addMemberBtn" class="flex items-center gap-3 px-8 py-4 rounded-2xl glass hover:bg-white/5 text-sm font-bold uppercase tracking-widest transition-all">
+                            <i data-lucide="user-plus" class="w-5 h-5 text-emerald-500"></i>
+                            KİŞİ EKLE (<span id="countSpan">1</span>/4)
+                        </button>
+                    </div>
+
+                    <button type="submit" id="submitBtn" class="w-full md:w-auto px-12 py-5 bg-[#9b1c31] text-white rounded-2xl font-black text-sm uppercase tracking-[0.2em] flex items-center justify-center gap-3 shadow-2xl hover:bg-red-700 transition-all">
+                        <span>KAYDI GÖNDER</span>
+                        <i data-lucide="send" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="py-16 px-6 text-center border-t border-white/5 bg-slate-950/80">
+        <p class="text-slate-500 text-[11px] max-w-xl mx-auto italic leading-relaxed mb-6">
+            Bu organizasyon İlköğretim Matematik Öğretmenliği Bölümü öğrencileri tarafından Ali ŞENGÜL koordinatörlüğünde yürütülmektedir.
+        </p>
+        <div class="text-[9px] font-bold tracking-[0.6em] text-slate-700 uppercase">
+            SDÜ Eğitim Fakültesi 2026 Oryantiring Komisyonu
+        </div>
+    </footer>
+
+    <script>
+        // --- Supabase Yapılandırması ---
+        const SUPABASE_URL = 'https://hxdmiamcednlzoklkxnu.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_2lmWYp5Pkvn_BsADVHPKug_KK9n8v2-';
+        
+        // ÖNEMLİ: 'supabase' ismi kütüphane tarafından kullanıldığı için çakışmayı önlemek amacıyla 'supabaseClient' ismini kullanıyoruz.
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // --- İkonlar ve UI ---
+        lucide.createIcons();
+        
+        const form = document.getElementById('regForm');
+        const wrapper = document.getElementById('membersWrapper');
+        const addBtn = document.getElementById('addMemberBtn');
+        const countSpan = document.getElementById('countSpan');
+        let memberCount = 1;
+
+        // Dinamik Üye Ekleme
+        addBtn.addEventListener('click', () => {
+            if (memberCount >= 4) return;
+
+            const memberDiv = document.createElement('div');
+            memberDiv.className = 'member-card reveal active';
+            memberDiv.dataset.index = memberCount;
+            memberDiv.innerHTML = `
+                <div class="flex items-center justify-between mb-8">
+                    <div class="flex items-center gap-3">
+                        <div class="bg-slate-800 p-2 rounded-lg text-slate-400"><i data-lucide="users" class="w-4 h-4"></i></div>
+                        <h3 class="text-lg font-black uppercase tracking-wider text-white">EKİP ÜYESİ (${memberCount + 1}. KİŞİ)</h3>
+                    </div>
+                    <button type="button" class="remove-btn p-2 hover:text-red-500 transition-colors">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                    </button>
+                </div>
+                <div class="grid md:grid-cols-2 gap-5">
+                    <input type="text" name="m${memberCount}_name" required placeholder="Ad Soyad" class="form-input">
+                    <input type="email" name="m${memberCount}_email" required placeholder="Email Adresi" class="form-input">
+                    <input type="text" name="m${memberCount}_class" required placeholder="Sınıf" class="form-input">
+                    <input type="text" name="m${memberCount}_dept" required placeholder="Bölüm" class="form-input">
+                    <input type="tel" name="m${memberCount}_phone" required placeholder="Telefon Numarası" class="form-input md:col-span-2">
+                </div>
+            `;
+            wrapper.appendChild(memberDiv);
+            lucide.createIcons();
+            memberCount++;
+            updateUI();
+
+            memberDiv.querySelector('.remove-btn').onclick = () => {
+                memberDiv.remove();
+                memberCount--;
+                updateUI();
+            };
+        });
+
+        function updateUI() {
+            countSpan.innerText = memberCount;
+            addBtn.style.opacity = memberCount >= 4 ? "0.3" : "1";
+            addBtn.style.pointerEvents = memberCount >= 4 ? "none" : "auto";
+        }
+
+        // Bildirim Gösterimi
+        function notify(title, msg, type = 'success') {
+            const notif = document.getElementById('notification');
+            const icon = document.getElementById('notif-icon');
+            const t = document.getElementById('notif-title');
+            const m = document.getElementById('notif-msg');
+            
+            notif.classList.remove('border-emerald-500', 'border-red-500');
+            notif.classList.add(type === 'success' ? 'border-emerald-500' : 'border-red-500');
+            
+            icon.className = `p-2 rounded-xl ${type === 'success' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-red-500/10 text-red-500'}`;
+            icon.innerHTML = `<i data-lucide="${type === 'success' ? 'check-circle' : 'alert-triangle'}"></i>`;
+            
+            t.innerText = title;
+            m.innerText = msg;
+            
+            lucide.createIcons();
+            notif.classList.add('show');
+            setTimeout(() => notif.classList.remove('show'), 6000);
+        }
+
+        // --- Supabase Kayıt İşlemi ---
+        form.onsubmit = async (e) => {
+            e.preventDefault();
+
+            const submitBtn = document.getElementById('submitBtn');
+            const originalHTML = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i><span>GÖNDERİLİYOR...</span>`;
+            lucide.createIcons();
+
+            const formData = new FormData(form);
+            const teamName = formData.get('teamName');
+            const members = [];
+
+            // Tüm üyelerin verilerini topla
+            const memberCards = document.querySelectorAll('.member-card');
+            memberCards.forEach((card) => {
+                const i = card.dataset.index;
+                members.push({
+                    name: formData.get(`m${i}_name`),
+                    email: formData.get(`m${i}_email`),
+                    class: formData.get(`m${i}_class`),
+                    dept: formData.get(`m${i}_dept`),
+                    phone: formData.get(`m${i}_phone`),
+                    is_leader: i === "0"
+                });
+            });
+
+            try {
+                // Supabase 'registrations' tablosuna ekle
+                const { data, error } = await supabaseClient
+                    .from('registrations')
+                    .insert([
+                        { 
+                            team_name: teamName, 
+                            members: members,
+                            created_at: new Date().toISOString()
+                        }
+                    ]);
+
+                if (error) throw error;
+
+                notify("Başarılı!", "Kayıt verileriniz Supabase'e güvenle iletildi.", "success");
+                form.reset();
+                while (wrapper.children.length > 1) wrapper.lastChild.remove();
+                memberCount = 1;
+                updateUI();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            } catch (err) {
+                console.error("Supabase Error:", err);
+                notify("Hata!", "Veri gönderilemedi. Lütfen tablo izinlerini kontrol edin.", "error");
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalHTML;
+                lucide.createIcons();
+            }
+        };
+
+        // Scroll ve Görünürlük Animasyonları
+        window.addEventListener('scroll', () => {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            document.getElementById('progress').style.width = scrolled + '%';
+            
+            const btn = document.getElementById("backToTop");
+            if (winScroll > 300) { btn.classList.remove('scale-0'); btn.classList.add('scale-100'); } 
+            else { btn.classList.remove('scale-100'); btn.classList.add('scale-0'); }
+        });
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('active'); });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+        function scrollToTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
+    </script>
+</body>
+</html>
