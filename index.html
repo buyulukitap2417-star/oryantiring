@@ -8,6 +8,7 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollToPlugin.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@300;500;700&display=swap');
@@ -19,10 +20,11 @@
 
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: #020617;
+            background-color: #010409;
             color: #f1f5f9;
             overflow-x: hidden;
             font-size: 14px;
+            scroll-behavior: smooth;
         }
 
         h1, h2, h3, .font-heading { font-family: 'Space Grotesk', sans-serif; }
@@ -30,81 +32,92 @@
         #bg-canvas {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
-            background: radial-gradient(circle at 50% 50%, #0f172a 0%, #020617 100%);
+            background: radial-gradient(circle at 50% 50%, #0d1117 0%, #010409 100%);
         }
 
         .glass {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
             border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: border-color 0.3s ease, background 0.3s ease;
+        }
+
+        .glass:hover {
+            border-color: rgba(155, 28, 49, 0.3);
+            background: rgba(255, 255, 255, 0.04);
         }
 
         .form-input {
-            background: rgba(255, 255, 255, 0.04);
+            background: rgba(255, 255, 255, 0.03);
             border: 1px solid rgba(255, 255, 255, 0.1);
             color: white;
-            padding: 0.75rem 1rem;
-            border-radius: 0.75rem;
+            padding: 0.7rem 1rem;
+            border-radius: 0.8rem;
             width: 100%;
             font-size: 0.9rem;
-            transition: all 0.3s ease;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .form-input:focus {
             outline: none;
             border-color: var(--sdu-red);
-            background: rgba(255, 255, 255, 0.07);
-            box-shadow: 0 0 15px rgba(155, 28, 49, 0.2);
+            background: rgba(255, 255, 255, 0.06);
+            transform: translateY(-1px);
         }
 
         .announcement-bar {
-            background: rgba(155, 28, 49, 0.95);
-            backdrop-filter: blur(8px);
+            background: rgba(155, 28, 49, 0.98);
+            backdrop-filter: blur(10px);
             z-index: 1000;
-            height: 32px;
+            height: 30px;
         }
 
         .marquee-content {
             display: inline-block;
-            animation: marquee 30s linear infinite;
+            animation: marquee 35s linear infinite;
             white-space: nowrap;
         }
 
         @keyframes marquee {
-            0% { transform: translateX(100%); }
+            0% { transform: translateX(50%); }
             100% { transform: translateX(-100%); }
         }
 
         .member-card {
-            border-left: 3px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border-left: 4px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.4s ease;
         }
         .member-card.leader { border-left-color: var(--sdu-red); }
 
         .custom-checkbox {
-            width: 20px; height: 20px;
+            width: 18px; height: 18px;
             cursor: pointer;
             accent-color: var(--sdu-red);
         }
 
         #notification {
             position: fixed;
-            top: 4rem; right: 1.5rem;
+            top: 3.5rem; right: 1.5rem;
             z-index: 2000;
-            transform: translateX(120%);
-            transition: transform 0.5s ease;
+            transform: translateX(130%);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         #notification.show { transform: translateX(0); }
 
         .btn-primary {
             background: var(--sdu-red);
-            transition: all 0.3s ease;
-            box-shadow: 0 10px 20px -10px rgba(155, 28, 49, 0.5);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .btn-primary:hover { transform: translateY(-2px); background: #b91c1c; }
+        .btn-primary:hover { 
+            transform: translateY(-2px) scale(1.02); 
+            background: #b91c1c; 
+            box-shadow: 0 10px 25px -5px rgba(155, 28, 49, 0.4);
+        }
 
-        ::-webkit-scrollbar { width: 5px; }
+        .reveal-node { opacity: 0; }
+
+        ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-thumb { background: var(--sdu-red); border-radius: 10px; }
     </style>
 </head>
@@ -115,52 +128,51 @@
 
     <!-- Duyuru Şeridi -->
     <div class="announcement-bar fixed top-0 w-full flex items-center overflow-hidden">
-        <div class="marquee-content flex gap-20">
-            <span class="text-[10px] font-bold uppercase tracking-widest text-white flex items-center gap-2">
-                <i data-lucide="calendar" class="w-3 h-3"></i> SON BAŞVURU: 12 MAYIS 2026
+        <div class="marquee-content flex gap-24">
+            <span class="text-[9px] font-bold uppercase tracking-[0.2em] text-white flex items-center gap-2">
+                <i data-lucide="calendar" class="w-3 h-3 text-amber-400"></i> SON BAŞVURU: 12 MAYIS 2026
             </span>
-            <span class="text-[10px] font-bold uppercase tracking-widest text-amber-200 flex items-center gap-2">
-                <i data-lucide="users" class="w-3 h-3"></i> TÜM BÖLÜMLER BAŞVURABİLİR
+            <span class="text-[9px] font-bold uppercase tracking-[0.2em] text-amber-200 flex items-center gap-2">
+                <i data-lucide="award" class="w-3 h-3"></i> TÜM BÖLÜMLER BAŞVURABİLİR
             </span>
-            <span class="text-[10px] font-bold uppercase tracking-widest text-white flex items-center gap-2">
-                <i data-lucide="map-pin" class="w-3 h-3"></i> SDÜ KAMPÜSÜNDE BÜYÜK HEYECAN
+            <span class="text-[9px] font-bold uppercase tracking-[0.2em] text-white flex items-center gap-2">
+                <i data-lucide="map" class="w-3 h-3 text-amber-400"></i> SDÜ KAMPÜSÜNDE BÜYÜK HEYECAN
             </span>
         </div>
     </div>
 
     <!-- Bildirim -->
-    <div id="notification" class="glass p-4 rounded-2xl border-l-4 min-w-[300px] shadow-xl">
+    <div id="notification" class="glass p-4 rounded-2xl border-l-4 min-w-[280px] shadow-2xl">
         <div class="flex items-center gap-3">
             <div id="notif-icon" class="w-10 h-10 rounded-xl flex items-center justify-center"></div>
             <div>
-                <h4 id="notif-title" class="font-bold text-xs uppercase text-white"></h4>
-                <p id="notif-msg" class="text-[11px] text-slate-400 mt-0.5"></p>
+                <h4 id="notif-title" class="font-bold text-xs uppercase text-white tracking-tight"></h4>
+                <p id="notif-msg" class="text-[10px] text-slate-400 mt-0.5 leading-snug"></p>
             </div>
         </div>
     </div>
 
     <!-- HERO -->
-    <section class="min-h-[85vh] flex flex-col items-center justify-center px-6 text-center">
-        <div class="mb-8 opacity-0 translate-y-4" id="hero-logo">
-            <!-- Oryantiring 2026 Logosu -->
-            <img src="https://r.resimlink.com/jJIpCL2HF4.png" alt="Oryantiring Yarışması 2026" class="w-32 md:w-44 mx-auto drop-shadow-[0_0_20px_rgba(155,28,49,0.3)]">
+    <section class="min-h-[90vh] flex flex-col items-center justify-center px-6 text-center">
+        <div class="mb-6 reveal-node" id="hero-logo-box">
+            <img src="https://r.resimlink.com/jJIpCL2HF4.png" alt="Oryantiring 2026" class="w-28 md:w-40 mx-auto drop-shadow-[0_0_25px_rgba(155,28,49,0.4)]">
         </div>
 
         <div class="z-10 max-w-4xl">
-            <div id="hero-tag" class="inline-block px-4 py-1 rounded-full glass border border-white/10 mb-6 opacity-0">
+            <div id="hero-tag" class="inline-block px-4 py-1 rounded-full glass border border-white/10 mb-6 reveal-node">
                 <span class="text-[9px] font-bold tracking-[0.3em] uppercase text-red-400">DOĞAYI KEŞFETMEYE HAZIR MISIN?</span>
             </div>
 
-            <h1 id="hero-title" class="text-4xl md:text-7xl font-black mb-6 tracking-tighter opacity-0 leading-tight">
+            <h1 id="hero-title" class="text-4xl md:text-7xl font-black mb-6 tracking-tighter reveal-node leading-tight">
                 ORYANTİRİNG <span class="text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-amber-500">YARIŞMASI 2026</span>
             </h1>
 
-            <p id="hero-desc" class="text-slate-400 text-sm md:text-lg max-w-2xl mx-auto mb-10 leading-relaxed opacity-0">
+            <p id="hero-desc" class="text-slate-400 text-sm md:text-lg max-w-2xl mx-auto mb-10 leading-relaxed reveal-node">
                 Süleyman Demirel Üniversitesi'nde adrenalin ve zeka birleşiyor. <br class="hidden md:block">
                 Bölüm fark etmeksizin tüm doğaseverler davetlidir. Ekibini kur, maceraya katıl!
             </p>
 
-            <div id="hero-btns" class="flex flex-wrap items-center justify-center gap-4 opacity-0">
+            <div id="hero-btns" class="flex flex-wrap items-center justify-center gap-4 reveal-node">
                 <a href="#kayit" class="btn-primary px-8 py-3 rounded-xl font-bold text-xs uppercase tracking-widest text-white shadow-lg">BAŞVURU YAP</a>
                 <a href="https://drive.google.com/file/d/1qJglHC2HL7pPERESImYu9lY_x01f2QkC/view?usp=sharing" target="_blank" class="glass px-8 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-white/5 transition-all flex items-center gap-2">
                     <i data-lucide="file-text" class="w-4 h-4 text-red-500"></i> YÖNERGE
@@ -170,41 +182,47 @@
     </section>
 
     <!-- MANTIK / NASIL OYNANIR -->
-    <section id="mantik" class="py-20 px-6 bg-black/20">
+    <section id="mantik" class="py-24 px-6 bg-black/20">
         <div class="max-w-5xl mx-auto">
-            <div class="grid md:grid-cols-2 gap-12 items-center">
-                <div class="reveal">
-                    <h2 class="text-2xl md:text-4xl font-black uppercase mb-6">DOĞA <span class="text-red-600">ZEKAYLA</span> BULUŞUYOR</h2>
-                    <p class="text-slate-400 text-sm leading-relaxed mb-6">
-                        Oryantiring, harita ve pusula yardımıyla hedef bulma sporudur. SDÜ 2026 Oryantiring Yarışması'nda sadece fiziksel hız değil, matematiksel odak ve strateji de kazanacak.
+            <div class="grid md:grid-cols-2 gap-16 items-center">
+                <div class="reveal-node" id="logic-text">
+                    <h2 class="text-2xl md:text-4xl font-black uppercase mb-6 leading-tight">DOĞA <span class="text-red-600">ZEKAYLA</span> BULUŞUYOR</h2>
+                    <p class="text-slate-400 text-sm leading-relaxed mb-8">
+                        Oryantiring, harita ve pusula yardımıyla hedef bulma sporudur. SDÜ 2026 Oryantiring Yarışması'nda sadece fiziksel hız değil, stratejik planlama ve ekip uyumu da kazanacak.
                     </p>
                     <div class="space-y-4">
-                        <div class="flex items-start gap-4 p-4 glass rounded-xl border-l-2 border-red-600">
+                        <div class="flex items-start gap-4 p-5 glass rounded-2xl border-l-2 border-red-600 shadow-sm">
                             <i data-lucide="map" class="w-5 h-5 text-red-500 shrink-0"></i>
-                            <p class="text-xs text-slate-300">Dijital haritadaki koordinatları deşifre ederek ilerleyin.</p>
+                            <div>
+                                <h4 class="text-xs font-bold text-white mb-1 uppercase tracking-wider">Navigasyon</h4>
+                                <p class="text-[11px] text-slate-400">Dijital haritadaki koordinatları deşifre ederek ilerleyin.</p>
+                            </div>
                         </div>
-                        <div class="flex items-start gap-4 p-4 glass rounded-xl border-l-2 border-blue-500">
+                        <div class="flex items-start gap-4 p-5 glass rounded-2xl border-l-2 border-blue-500 shadow-sm">
                             <i data-lucide="brain" class="w-5 h-5 text-blue-500 shrink-0"></i>
-                            <p class="text-xs text-slate-300">Her kontrol noktasındaki bilmeceleri çözerek şifreyi tamamlayın.</p>
+                            <div>
+                                <h4 class="text-xs font-bold text-white mb-1 uppercase tracking-wider">Problem Çözme</h4>
+                                <p class="text-[11px] text-slate-400">Kontrol noktalarındaki bilmeceleri çözerek şifreyi tamamlayın.</p>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="grid grid-cols-2 gap-4 reveal">
-                    <div class="glass p-6 rounded-2xl text-center">
+                <div class="grid grid-cols-2 gap-4 reveal-node" id="logic-grid">
+                    <div class="glass p-7 rounded-3xl text-center border-b-2 border-amber-500/50">
                         <i data-lucide="clock" class="w-6 h-6 mx-auto mb-3 text-amber-500"></i>
-                        <span class="block text-[10px] font-bold uppercase text-white">Hızlı Karar</span>
+                        <span class="block text-[10px] font-bold uppercase text-white tracking-widest">HIZ</span>
                     </div>
-                    <div class="glass p-6 rounded-2xl text-center">
+                    <div class="glass p-7 rounded-3xl text-center border-b-2 border-emerald-500/50">
                         <i data-lucide="users" class="w-6 h-6 mx-auto mb-3 text-emerald-500"></i>
-                        <span class="block text-[10px] font-bold uppercase text-white">Ekip Ruhu</span>
+                        <span class="block text-[10px] font-bold uppercase text-white tracking-widest">TAKIM</span>
                     </div>
-                    <div class="glass p-6 rounded-2xl text-center">
+                    <div class="glass p-7 rounded-3xl text-center border-b-2 border-red-500/50">
                         <i data-lucide="target" class="w-6 h-6 mx-auto mb-3 text-red-500"></i>
-                        <span class="block text-[10px] font-bold uppercase text-white">Tam Odak</span>
+                        <span class="block text-[10px] font-bold uppercase text-white tracking-widest">ODAK</span>
                     </div>
-                    <div class="glass p-6 rounded-2xl text-center">
+                    <div class="glass p-7 rounded-3xl text-center border-b-2 border-blue-500/50">
                         <i data-lucide="compass" class="w-6 h-6 mx-auto mb-3 text-blue-500"></i>
-                        <span class="block text-[10px] font-bold uppercase text-white">Navigasyon</span>
+                        <span class="block text-[10px] font-bold uppercase text-white tracking-widest">YÖN</span>
                     </div>
                 </div>
             </div>
@@ -214,130 +232,192 @@
     <!-- FORM -->
     <section id="kayit" class="py-24 px-6">
         <div class="max-w-3xl mx-auto">
-            <div class="text-center mb-12 reveal">
+            <div class="text-center mb-16 reveal-node">
                 <h2 class="text-3xl md:text-5xl font-black tracking-tight uppercase mb-4">BAŞVURU <span class="text-red-600">PANELİ</span></h2>
-                <p class="text-slate-500 text-[10px] font-bold tracking-[0.3em] uppercase italic">Ekibini Kaydet (2-4 Kişi)</p>
+                <div class="flex items-center justify-center gap-3">
+                    <span class="h-px w-8 bg-slate-800"></span>
+                    <p class="text-slate-500 text-[10px] font-bold tracking-[0.3em] uppercase italic">Ekibini Kaydet (2-4 Kişi)</p>
+                    <span class="h-px w-8 bg-slate-800"></span>
+                </div>
             </div>
 
-            <form id="regForm" class="glass p-8 md:p-12 rounded-[2rem] border border-white/5 space-y-10">
+            <form id="regForm" class="glass p-8 md:p-14 rounded-[2.5rem] border border-white/5 space-y-12 reveal-node shadow-2xl relative overflow-hidden">
+                <div class="absolute -top-24 -right-24 w-48 h-48 bg-red-600/5 rounded-full blur-3xl"></div>
                 
-                <!-- Takım Adı -->
-                <div class="space-y-4">
-                    <div class="flex items-center gap-2 text-red-500">
-                        <i data-lucide="flag" class="w-4 h-4"></i>
-                        <h3 class="text-xs font-black uppercase tracking-widest">TAKIM İSMİ</h3>
+                <!-- Takım Bilgisi -->
+                <div class="space-y-5">
+                    <div class="flex items-center gap-3 text-red-500">
+                        <div class="p-2 bg-red-500/10 rounded-lg"><i data-lucide="flag" class="w-4 h-4"></i></div>
+                        <h3 class="text-xs font-black uppercase tracking-[0.2em]">TAKIM İSMİ</h3>
                     </div>
-                    <input type="text" name="teamName" required placeholder="Örn: SDÜ Kaşifleri" class="form-input text-lg font-bold">
+                    <input type="text" name="teamName" required placeholder="Efsane Takım İsminiz" class="form-input text-xl font-bold text-center py-4">
                 </div>
 
                 <!-- Oyuncular -->
                 <div id="membersWrapper" class="space-y-8">
-                    <div class="member-card leader glass p-6 rounded-2xl" data-index="0">
-                        <div class="flex items-center gap-2 mb-6">
-                            <i data-lucide="crown" class="w-4 h-4 text-amber-500"></i>
-                            <span class="text-[10px] font-black text-white uppercase tracking-wider">TAKIM LİDERİ</span>
+                    <div class="member-card leader glass p-7 rounded-3xl relative overflow-hidden" data-index="0">
+                        <div class="absolute top-0 right-0 p-3"><i data-lucide="crown" class="w-5 h-5 text-amber-500/30"></i></div>
+                        <div class="flex items-center gap-3 mb-6">
+                            <span class="text-[10px] font-black text-white uppercase tracking-[0.2em] bg-red-600/20 px-3 py-1 rounded-full">KAPTAN</span>
                         </div>
-                        <div class="grid md:grid-cols-2 gap-3">
+                        <div class="grid md:grid-cols-2 gap-4">
                             <input type="text" name="m0_name" required placeholder="Ad Soyad" class="form-input">
                             <input type="email" name="m0_email" required placeholder="E-posta" class="form-input">
                             <input type="text" name="m0_class" required placeholder="Sınıf" class="form-input">
                             <input type="text" name="m0_dept" required placeholder="Bölüm" class="form-input">
-                            <input type="tel" name="m0_phone" required placeholder="Telefon" class="form-input md:col-span-2">
+                            <input type="tel" name="m0_phone" required placeholder="Telefon Numarası" class="form-input md:col-span-2">
                         </div>
                     </div>
                 </div>
 
                 <!-- Ekle Butonu -->
-                <button type="button" id="addMemberBtn" class="w-full py-4 border border-dashed border-white/20 rounded-xl text-slate-400 hover:text-white hover:border-red-500/50 transition-all flex items-center justify-center gap-2 text-xs font-bold uppercase">
-                    <i data-lucide="user-plus" class="w-4 h-4"></i> ÜYE EKLE (<span id="countSpan">1</span>/4)
+                <button type="button" id="addMemberBtn" class="w-full py-5 border-2 border-dashed border-white/10 rounded-2xl text-slate-500 hover:text-white hover:border-red-500/40 hover:bg-white/5 transition-all flex items-center justify-center gap-3 text-xs font-bold uppercase tracking-widest">
+                    <i data-lucide="user-plus" class="w-4 h-4 text-red-500"></i> ÜYE EKLE (<span id="countSpan">1</span>/4)
                 </button>
 
                 <!-- Onaylar -->
-                <div class="pt-6 border-t border-white/5 space-y-4">
-                    <label class="flex items-start gap-3 cursor-pointer group p-3 glass rounded-xl hover:bg-white/5 transition-all">
-                        <input type="checkbox" id="kvkkConsent" required class="custom-checkbox mt-0.5">
-                        <span class="text-[11px] text-slate-300 leading-relaxed select-none">
-                            <a href="https://drive.google.com/file/d/1B743wlb1xI0cgOWa8sJ12spXviXz0u8E/view?usp=sharing" target="_blank" class="text-red-500 hover:underline font-bold underline-offset-4">KVKK Aydınlatma Metni</a>'ni ve 
-                            <a href="https://drive.google.com/file/d/1mEDVrxvToP1ZF7PQcYpgwpulFlmzSsh9/view?usp=sharing" target="_blank" class="text-red-500 hover:underline font-bold underline-offset-4">Gizlilik Sözleşmesi</a>'ni okudum, onaylıyorum.
+                <div class="pt-8 border-t border-white/5">
+                    <label class="flex items-start gap-4 cursor-pointer group p-4 glass rounded-2xl hover:bg-white/5 transition-all border border-transparent hover:border-white/10">
+                        <input type="checkbox" id="kvkkConsent" required class="custom-checkbox mt-1">
+                        <span class="text-[11px] text-slate-400 leading-relaxed select-none">
+                            <a href="https://drive.google.com/file/d/1B743wlb1xI0cgOWa8sJ12spXviXz0u8E/view?usp=sharing" target="_blank" class="text-red-500 hover:underline font-bold transition-all">KVKK Aydınlatma Metni</a>'ni ve 
+                            <a href="https://drive.google.com/file/d/1mEDVrxvToP1ZF7PQcYpgwpulFlmzSsh9/view?usp=sharing" target="_blank" class="text-red-500 hover:underline font-bold transition-all">Gizlilik Sözleşmesi</a>'ni okudum, onaylıyorum.
                         </span>
                     </label>
                 </div>
 
                 <!-- Gönder -->
-                <div class="text-center space-y-4">
-                    <div id="validationWarning" class="text-[9px] font-bold text-red-500 uppercase tracking-widest opacity-0">
-                        * Takım en az 2 kişiden oluşmalıdır!
+                <div class="text-center space-y-6">
+                    <div id="validationWarning" class="text-[9px] font-bold text-red-500 uppercase tracking-widest opacity-0 transform translate-y-2 transition-all">
+                        * Yarışma için en az 1 ekip üyesi (toplam 2 kişi) eklemelisiniz!
                     </div>
-                    <button type="submit" id="submitBtn" class="btn-primary w-full py-4 rounded-xl font-black text-xs uppercase tracking-[0.2em] text-white flex items-center justify-center gap-2">
-                        KAYDI GÖNDER <i data-lucide="send" class="w-4 h-4"></i>
+                    <button type="submit" id="submitBtn" class="btn-primary w-full py-5 rounded-2xl font-black text-xs uppercase tracking-[0.3em] text-white flex items-center justify-center gap-3 shadow-2xl">
+                        KAYDI TAMAMLA VE GÖNDER <i data-lucide="send-to-back" class="w-4 h-4"></i>
                     </button>
                 </div>
             </form>
         </div>
     </section>
 
-    <footer class="py-16 text-center border-t border-white/5 bg-black/30">
+    <!-- FOOTER -->
+    <footer class="py-20 text-center border-t border-white/5 bg-black/40">
         <div class="max-w-5xl mx-auto px-6">
-            <img src="https://r.resimlink.com/jJIpCL2HF4.png" alt="Oryantiring 2026" class="w-24 md:w-32 mx-auto mb-8 transition-transform hover:scale-110 duration-500">
-            <div class="text-[10px] font-black tracking-[0.4em] text-slate-400 uppercase leading-relaxed">
+            <img src="https://r.resimlink.com/ICQnaWY.png" alt="SDÜ Oryantiring" class="w-36 md:w-48 mx-auto mb-10 transition-transform hover:scale-105 duration-700 drop-shadow-[0_0_20px_rgba(255,255,255,0.05)]">
+            <div class="text-[10px] font-black tracking-[0.5em] text-slate-500 uppercase leading-relaxed">
                 SDÜ EĞİTİM FAKÜLTESİ ORYANTİRİNG YARIŞMASI 2026
+            </div>
+            <div class="mt-4 text-[9px] text-slate-600 uppercase tracking-widest font-medium opacity-50">
+                Tüm Hakları Saklıdır &copy; 2026
             </div>
         </div>
     </footer>
 
     <script>
+        // Supabase Init
         const SUPABASE_URL = 'https://hxdmiamcednlzoklkxnu.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_2lmWYp5Pkvn_BsADVHPKug_KK9n8v2-';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+        // UI Helpers
         function initIcons() { lucide.createIcons(); }
         initIcons();
 
+        // GSAP Animations
+        gsap.registerPlugin(ScrollTrigger);
+
         window.onload = () => {
             const tl = gsap.timeline();
-            tl.to("#hero-logo", { opacity: 1, y: 0, duration: 0.8 })
-              .to("#hero-tag", { opacity: 1, duration: 0.5 }, "-=0.3")
-              .to("#hero-title", { opacity: 1, y: 0, duration: 0.7 }, "-=0.3")
-              .to("#hero-desc", { opacity: 1, duration: 0.5 }, "-=0.3")
-              .to("#hero-btns", { opacity: 1, y: 0, duration: 0.5 }, "-=0.3");
+            tl.to("#hero-logo-box", { opacity: 1, y: 0, duration: 1, ease: "power4.out" })
+              .to("#hero-tag", { opacity: 1, duration: 0.6, ease: "power2.out" }, "-=0.6")
+              .to("#hero-title", { opacity: 1, y: 0, duration: 1, ease: "expo.out" }, "-=0.6")
+              .to("#hero-desc", { opacity: 1, duration: 0.6 }, "-=0.7")
+              .to("#hero-btns", { opacity: 1, y: 0, duration: 0.8, ease: "back.out(1.7)" }, "-=0.6");
 
-            gsap.registerPlugin(ScrollTrigger);
-            document.querySelectorAll('.reveal').forEach(el => {
-                gsap.from(el, { scrollTrigger: el, y: 30, opacity: 0, duration: 0.8 });
+            // Scroll Reveal
+            document.querySelectorAll('.reveal-node').forEach(el => {
+                gsap.to(el, {
+                    scrollTrigger: {
+                        trigger: el,
+                        start: "top 85%",
+                        toggleActions: "play none none reverse"
+                    },
+                    opacity: 1,
+                    y: 0,
+                    scale: 1,
+                    duration: 0.8,
+                    ease: "power2.out"
+                });
             });
         };
 
+        // Advanced Background Network Animation
         const canvas = document.getElementById('bg-canvas');
         const ctx = canvas.getContext('2d');
-        let particles = [];
+        let dots = [];
+        const dotCount = 100;
+        const connectionDist = 120;
+
         function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
         window.onresize = resize; resize();
 
-        class P {
-            constructor() { this.x = Math.random()*canvas.width; this.y = Math.random()*canvas.height; this.s = Math.random()*1.5; this.vx = Math.random()*0.4-0.2; this.vy = Math.random()*0.4-0.2; }
-            u() { this.x+=this.vx; this.y+=this.vy; if(this.x>canvas.width)this.x=0; if(this.y>canvas.height)this.y=0; }
-            d() { ctx.fillStyle = 'rgba(155, 28, 49, 0.3)'; ctx.beginPath(); ctx.arc(this.x, this.y, this.s, 0, Math.PI*2); ctx.fill(); }
+        class Dot {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.vx = (Math.random() - 0.5) * 0.4;
+                this.vy = (Math.random() - 0.5) * 0.4;
+                this.r = Math.random() * 1.5 + 0.5;
+            }
+            update() {
+                this.x += this.vx; this.y += this.vy;
+                if(this.x < 0 || this.x > canvas.width) this.vx *= -1;
+                if(this.y < 0 || this.y > canvas.height) this.vy *= -1;
+            }
+            draw() {
+                ctx.fillStyle = 'rgba(155, 28, 49, 0.4)';
+                ctx.beginPath(); ctx.arc(this.x, this.y, this.r, 0, Math.PI*2); ctx.fill();
+            }
         }
-        for(let i=0; i<60; i++) particles.push(new P());
-        function anim() { ctx.clearRect(0,0,canvas.width,canvas.height); particles.forEach(p=>{p.u();p.d();}); requestAnimationFrame(anim); }
-        anim();
 
+        for(let i=0; i<dotCount; i++) dots.push(new Dot());
+
+        function animate() {
+            ctx.clearRect(0,0,canvas.width,canvas.height);
+            for(let i=0; i<dots.length; i++) {
+                dots[i].update(); dots[i].draw();
+                for(let j=i+1; j<dots.length; j++) {
+                    const dx = dots[i].x - dots[j].x;
+                    const dy = dots[i].y - dots[j].y;
+                    const dist = Math.sqrt(dx*dx + dy*dy);
+                    if(dist < connectionDist) {
+                        ctx.strokeStyle = `rgba(155, 28, 49, ${0.15 * (1 - dist/connectionDist)})`;
+                        ctx.lineWidth = 0.5;
+                        ctx.beginPath(); ctx.moveTo(dots[i].x, dots[i].y); ctx.lineTo(dots[j].x, dots[j].y); ctx.stroke();
+                    }
+                }
+            }
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        // Form Logic
         const wrapper = document.getElementById('membersWrapper');
         const countSpan = document.getElementById('countSpan');
         const warning = document.getElementById('validationWarning');
+        const kvkk = document.getElementById('kvkkConsent');
         let memberCount = 1;
 
         document.getElementById('addMemberBtn').onclick = () => {
             if(memberCount >= 4) return;
             const div = document.createElement('div');
-            div.className = 'member-card glass p-6 rounded-2xl opacity-0';
+            div.className = 'member-card glass p-7 rounded-3xl opacity-0 translate-x-[-10px] scale-[0.98]';
             div.dataset.index = memberCount;
             div.innerHTML = `
                 <div class="flex items-center justify-between mb-6">
-                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-wider">OYUNCU ${memberCount+1}</span>
-                    <button type="button" class="rmv text-slate-500 hover:text-red-500"><i data-lucide="x" class="w-4 h-4"></i></button>
+                    <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">KATILIMCI ${memberCount+1}</span>
+                    <button type="button" class="rmv p-1 text-slate-600 hover:text-red-500 transition-colors"><i data-lucide="x-circle" class="w-5 h-5"></i></button>
                 </div>
-                <div class="grid md:grid-cols-2 gap-3">
+                <div class="grid md:grid-cols-2 gap-4">
                     <input type="text" name="m${memberCount}_name" required placeholder="Ad Soyad" class="form-input">
                     <input type="email" name="m${memberCount}_email" required placeholder="E-posta" class="form-input">
                     <input type="text" name="m${memberCount}_class" required placeholder="Sınıf" class="form-input">
@@ -347,34 +427,40 @@
             `;
             wrapper.appendChild(div);
             initIcons();
-            gsap.to(div, { opacity: 1, duration: 0.4 });
+            gsap.to(div, { opacity: 1, x: 0, scale: 1, duration: 0.4, ease: "power2.out" });
             memberCount++;
             updateUI();
             div.querySelector('.rmv').onclick = () => {
-                div.remove(); memberCount--; updateUI();
+                gsap.to(div, { opacity: 0, scale: 0.95, duration: 0.3, onComplete: () => { div.remove(); memberCount--; updateUI(); } });
             };
         };
 
         function updateUI() {
             countSpan.innerText = memberCount;
-            warning.style.opacity = memberCount < 2 ? "1" : "0";
+            if(memberCount < 2) {
+                warning.style.opacity = "1"; warning.style.transform = "translateY(0)";
+            } else {
+                warning.style.opacity = "0"; warning.style.transform = "translateY(10px)";
+            }
         }
+        updateUI();
 
         function notify(t, m, type='success') {
             const n = document.getElementById('notification');
             const icon = document.getElementById('notif-icon');
-            n.className = `glass p-4 rounded-2xl border-l-4 min-w-[300px] shadow-xl show ${type==='success'?'border-emerald-500':'border-red-500'}`;
+            n.className = `glass p-4 rounded-2xl border-l-4 min-w-[280px] shadow-2xl show ${type==='success'?'border-emerald-500':'border-red-500'}`;
             icon.className = `w-10 h-10 rounded-xl flex items-center justify-center ${type==='success'?'bg-emerald-500/10 text-emerald-500':'bg-red-500/10 text-red-500'}`;
-            icon.innerHTML = `<i data-lucide="${type==='success'?'check':'alert-triangle'}"></i>`;
+            icon.innerHTML = `<i data-lucide="${type==='success'?'check-circle':'alert-circle'}"></i>`;
             document.getElementById('notif-title').innerText = t;
             document.getElementById('notif-msg').innerText = m;
             initIcons();
-            setTimeout(()=>n.classList.remove('show'), 4000);
+            setTimeout(()=>n.classList.remove('show'), 5000);
         }
 
         document.getElementById('regForm').onsubmit = async (e) => {
             e.preventDefault();
-            if(memberCount < 2) { notify("Hata", "Takım en az 2 kişi olmalı.", "error"); return; }
+            if(memberCount < 2) { notify("Eksik Kadro", "Takım en az 2 kişiden oluşmalıdır.", "error"); return; }
+            if(!kvkk.checked) { notify("Onay Gerekli", "Lütfen KVKK ve Gizlilik Sözleşmesi'ni onaylayın.", "error"); return; }
             
             const btn = document.getElementById('submitBtn');
             const orig = btn.innerHTML;
@@ -395,14 +481,15 @@
             });
 
             try {
-                const { error } = await supabaseClient.from('registrations').insert([{ team_name: fd.get('teamName'), members }]);
+                const { error } = await supabaseClient.from('registrations').insert([{ team_name: fd.get('teamName'), members, created_at: new Date().toISOString() }]);
                 if(error) throw error;
-                notify("Başarılı", "Kaydınız alındı!");
+                notify("Kayıt Başarılı", "Takımınız sisteme kaydedildi. Başarılar!");
                 e.target.reset();
                 while (wrapper.children.length > 1) wrapper.lastChild.remove();
                 memberCount = 1; updateUI();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
             } catch(err) {
-                notify("Hata", "Bağlantı hatası oluştu.", "error");
+                notify("Hata", "Bağlantı sorunu oluştu, lütfen tekrar deneyin.", "error");
             } finally {
                 btn.disabled = false; btn.innerHTML = orig; initIcons();
             }
