@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Oryantiring Yarışması 2026 | İptal Duyurusu</title>
+    <title>Önemli Duyuru | Oryantiring Yarışması 2026</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
@@ -12,18 +12,20 @@
         
         :root {
             --sdu-red: #9b1c31;
-            --sdu-gray: #475569;
+            --bg-dark: #020617;
         }
 
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: #010409;
+            background-color: var(--bg-dark);
             color: #f1f5f9;
-            overflow: hidden;
+            margin: 0;
+            padding: 0;
             height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
+            overflow: hidden;
         }
 
         h1, h2, .font-heading { font-family: 'Space Grotesk', sans-serif; }
@@ -31,62 +33,42 @@
         #bg-canvas {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
-            background: radial-gradient(circle at 50% 50%, #0d1117 0%, #010409 100%);
-            opacity: 0.6;
+            background: radial-gradient(circle at 50% 50%, #0f172a 0%, #020617 100%);
+            opacity: 0.5;
         }
 
-        .glass {
+        .glass-notice {
             background: rgba(255, 255, 255, 0.02);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
             border: 1px solid rgba(255, 255, 255, 0.08);
-        }
-
-        .announcement-bar {
-            background: rgba(155, 28, 49, 0.98);
-            backdrop-filter: blur(10px);
-            z-index: 1000;
-            height: 30px;
-        }
-
-        .marquee-content {
-            display: inline-block;
-            animation: marquee 40s linear infinite;
-            white-space: nowrap;
-        }
-
-        @keyframes marquee {
-            0% { transform: translateX(30%); }
-            100% { transform: translateX(-100%); }
-        }
-
-        .cancellation-card {
-            max-width: 600px;
-            width: 92%;
-            padding: 3rem 2rem;
-            border-radius: 3rem;
-            text-align: center;
             border-top: 4px solid var(--sdu-red);
+            border-radius: 3rem;
+            max-width: 600px;
+            width: 90%;
+            padding: 3rem 2rem;
+            text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
             opacity: 0;
-            transform: translateY(30px);
+            transform: translateY(20px);
         }
 
         @media (max-width: 640px) {
-            .cancellation-card {
+            .glass-notice {
                 padding: 2.5rem 1.5rem;
                 border-radius: 2rem;
             }
         }
 
-        .status-badge {
+        .alert-badge {
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
             background: rgba(155, 28, 49, 0.1);
             color: #ef4444;
-            padding: 0.5rem 1.25rem;
+            padding: 0.6rem 1.25rem;
             border-radius: 100px;
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 0.1em;
@@ -94,12 +76,23 @@
             border: 1px solid rgba(239, 68, 68, 0.2);
         }
 
-        .data-notice {
+        .data-privacy-box {
             background: rgba(59, 130, 246, 0.05);
             border: 1px solid rgba(59, 130, 246, 0.2);
-            padding: 1.25rem;
+            padding: 1.5rem;
             border-radius: 1.5rem;
-            margin-top: 2rem;
+            margin: 2.5rem 0;
+            text-align: left;
+        }
+
+        .icon-pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
         }
     </style>
 </head>
@@ -107,21 +100,9 @@
 
     <canvas id="bg-canvas"></canvas>
 
-    <div class="announcement-bar fixed top-0 w-full flex items-center overflow-hidden">
-        <div class="marquee-content">
-            <span class="text-[9px] font-bold uppercase tracking-[0.2em] text-white flex items-center gap-2">
-                <i data-lucide="info" class="w-3 h-3 text-red-400"></i> ÖNEMLİ DUYURU: ORYANTİRİNG YARIŞMASI 2026 İPTAL EDİLMİŞTİR. BAŞVURU ALIMI KAPALIDIR. SİSTEMLERİMİZDEKİ VERİLER SİLİNECEKTİR.
-            </span>
-        </div>
-    </div>
-
-    <main class="cancellation-card glass shadow-2xl" id="notice-card">
-        <div class="logo-box mb-8">
-            <img src="https://r.resimlink.com/jJIpCL2HF4.png" alt="Oryantiring 2026" class="w-24 mx-auto grayscale opacity-50">
-        </div>
-
-        <div class="status-badge">
-            <i data-lucide="alert-triangle" class="w-4 h-4"></i> YARIŞMA İPTAL EDİLDİ
+    <main class="glass-notice" id="notice-card">
+        <div class="alert-badge">
+            <i data-lucide="alert-circle" class="w-4 h-4"></i> İPTAL DUYURUSU
         </div>
 
         <h1 class="text-3xl md:text-5xl font-black mb-6 tracking-tighter leading-tight text-white uppercase">
@@ -129,28 +110,30 @@
         </h1>
 
         <div class="space-y-6">
-            <p class="text-slate-400 text-sm md:text-base leading-relaxed font-medium">
-                Süleyman Demirel Üniversitesi Oryantiring Yarışması 2026, maalesef yeterli katılım sağlanamaması ve hakem heyetinden gelen istifalar sonucunda <strong>iptal edilmiştir.</strong>
+            <p class="text-slate-300 text-sm md:text-base leading-relaxed font-medium">
+                Süleyman Demirel Üniversitesi <strong>Oryantiring Yarışması 2026</strong>, yeterli katılım sağlanamaması ve hakem heyetinden gelen istifalar nedeniyle <strong>iptal edilmiştir.</strong>
             </p>
 
-            <div class="data-notice">
-                <div class="flex items-center justify-center gap-2 mb-2">
-                    <i data-lucide="shield-check" class="w-4 h-4 text-blue-400"></i>
-                    <h4 class="text-blue-400 text-[10px] font-bold uppercase tracking-widest">Kişisel Verilerin Korunması</h4>
+            <div class="data-privacy-box">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="p-2 bg-blue-500/20 rounded-lg text-blue-400">
+                        <i data-lucide="shield-check" class="w-5 h-5"></i>
+                    </div>
+                    <h4 class="text-blue-400 text-xs font-bold uppercase tracking-widest">Kişisel Verilerin Korunması</h4>
                 </div>
-                <p class="text-slate-300 text-xs leading-relaxed">
-                    Kayıt yaptıran katılımcılarımızın tüm verileri, gizlilik politikamız gereği <span class="text-blue-400 font-bold">16 Mayıs itibariyle</span> tüm sistemlerimizden kalıcı olarak silinecektir.
+                <p class="text-slate-400 text-[11px] md:text-xs leading-relaxed">
+                    Kayıt yaptıran tüm katılımcılarımızın güvenliği önceliğimizdir. Bu doğrultuda, sistemlerimizde kayıtlı olan tüm kişisel verileriniz <span class="text-blue-400 font-bold">16 Mayıs 2026</span> tarihi itibariyle kalıcı olarak silinecek ve veritabanlarımız tamamen temizlenecektir.
                 </p>
             </div>
 
             <p class="text-slate-500 text-xs italic">
-                Gösterdiğiniz ilgi için teşekkür ederiz.
+                Organizasyona gösterdiğiniz ilgi için teşekkür ederiz.
             </p>
         </div>
 
         <div class="pt-10 mt-10 border-t border-white/5">
             <h3 class="text-amber-500 font-bold uppercase tracking-widest text-xs mb-2">SENEYE TEKRAR GÖRÜŞMEK ÜZERE</h3>
-            <p class="text-[10px] text-slate-600 uppercase tracking-widest font-bold">SDÜ EĞİTİM FAKÜLTESİ ORYANTİRİNG EKİBİ</p>
+            <p class="text-[9px] text-slate-600 uppercase tracking-[0.4em] font-bold">SDÜ EĞİTİM FAKÜLTESİ ORYANTİRİNG EKİBİ</p>
         </div>
     </main>
 
@@ -161,7 +144,7 @@
             gsap.to("#notice-card", {
                 opacity: 1,
                 y: 0,
-                duration: 1.2,
+                duration: 1.5,
                 ease: "expo.out"
             });
         };
@@ -169,17 +152,21 @@
         const canvas = document.getElementById('bg-canvas');
         const ctx = canvas.getContext('2d');
         let dots = [];
-        const dotCount = 60;
+        const dotCount = 40;
 
-        function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-        window.onresize = resize; resize();
+        function resize() { 
+            canvas.width = window.innerWidth; 
+            canvas.height = window.innerHeight; 
+        }
+        window.onresize = resize; 
+        resize();
 
         class Dot {
             constructor() {
                 this.x = Math.random() * canvas.width;
                 this.y = Math.random() * canvas.height;
-                this.vx = (Math.random() - 0.5) * 0.15;
-                this.vy = (Math.random() - 0.5) * 0.15;
+                this.vx = (Math.random() - 0.5) * 0.2;
+                this.vy = (Math.random() - 0.5) * 0.2;
                 this.r = Math.random() * 1 + 0.5;
             }
             update() {
@@ -204,7 +191,7 @@
                     const dy = dots[i].y - dots[j].y;
                     const dist = Math.sqrt(dx*dx + dy*dy);
                     if(dist < 150) {
-                        ctx.strokeStyle = `rgba(155, 28, 49, ${0.08 * (1 - dist/150)})`;
+                        ctx.strokeStyle = `rgba(155, 28, 49, ${0.1 * (1 - dist/150)})`;
                         ctx.lineWidth = 0.5;
                         ctx.beginPath(); ctx.moveTo(dots[i].x, dots[i].y); ctx.lineTo(dots[j].x, dots[j].y); ctx.stroke();
                     }
