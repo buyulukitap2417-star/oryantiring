@@ -3,36 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Oryantiring Yarışması 2026 | SDÜ</title>
+    <title>Oryantiring Yarışması 2026 | İptal Duyurusu</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollToPlugin.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@300;500;700&display=swap');
         
         :root {
             --sdu-red: #9b1c31;
-            --sdu-gold: #fbbf24;
+            --sdu-gray: #475569;
         }
 
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: #010409;
             color: #f1f5f9;
-            overflow-x: hidden;
-            font-size: 14px;
-            scroll-behavior: smooth;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        h1, h2, h3, .font-heading { font-family: 'Space Grotesk', sans-serif; }
+        h1, h2, .font-heading { font-family: 'Space Grotesk', sans-serif; }
 
         #bg-canvas {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
             background: radial-gradient(circle at 50% 50%, #0d1117 0%, #010409 100%);
+            opacity: 0.6;
         }
 
         .glass {
@@ -40,43 +40,6 @@
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.08);
-            transition: all 0.3s ease;
-        }
-
-        .form-input-container {
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
-
-        .form-input-icon {
-            position: absolute;
-            left: 1rem;
-            color: rgba(255, 255, 255, 0.3);
-            pointer-events: none;
-            transition: color 0.3s ease;
-        }
-
-        .form-input {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: white;
-            padding: 0.8rem 1rem 0.8rem 2.8rem;
-            border-radius: 1rem;
-            width: 100%;
-            font-size: 0.9rem;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .form-input:focus {
-            outline: none;
-            border-color: var(--sdu-red);
-            background: rgba(255, 255, 255, 0.06);
-            transform: translateY(-1px);
-        }
-
-        .form-input:focus + .form-input-icon {
-            color: var(--sdu-red);
         }
 
         .announcement-bar {
@@ -88,394 +51,125 @@
 
         .marquee-content {
             display: inline-block;
-            animation: marquee 35s linear infinite;
+            animation: marquee 40s linear infinite;
             white-space: nowrap;
         }
 
         @keyframes marquee {
-            0% { transform: translateX(50%); }
+            0% { transform: translateX(30%); }
             100% { transform: translateX(-100%); }
         }
 
-        .member-card {
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            transition: all 0.4s ease;
-            position: relative;
-        }
-        
-        .member-card.leader {
-            border-color: rgba(251, 191, 36, 0.2);
-            background: linear-gradient(145deg, rgba(251, 191, 36, 0.03), rgba(155, 28, 49, 0.03));
-        }
-
-        .custom-checkbox {
-            width: 20px; height: 20px;
-            cursor: pointer;
-            accent-color: var(--sdu-red);
-        }
-
-        #notification {
-            position: fixed;
-            top: 3.5rem; right: 1.5rem;
-            z-index: 2000;
-            transform: translateX(130%);
-            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        #notification.show { transform: translateX(0); }
-
-        .btn-primary {
-            background: var(--sdu-red);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        .btn-primary:hover { 
-            transform: translateY(-2px) scale(1.02); 
-            background: #b91c1c; 
-            box-shadow: 0 15px 30px -10px rgba(155, 28, 49, 0.6);
-        }
-
-        #back-to-top {
-            position: fixed;
-            bottom: 2rem;
-            right: 2rem;
-            z-index: 500;
+        .cancellation-card {
+            max-width: 600px;
+            width: 92%;
+            padding: 3rem 2rem;
+            border-radius: 3rem;
+            text-align: center;
+            border-top: 4px solid var(--sdu-red);
             opacity: 0;
-            transform: translateY(20px);
-            pointer-events: none;
-            transition: all 0.4s ease;
+            transform: translateY(30px);
         }
 
-        #back-to-top.visible {
-            opacity: 1;
-            transform: translateY(0);
-            pointer-events: auto;
+        @media (max-width: 640px) {
+            .cancellation-card {
+                padding: 2.5rem 1.5rem;
+                border-radius: 2rem;
+            }
         }
 
-        .reveal-node { opacity: 0; }
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(155, 28, 49, 0.1);
+            color: #ef4444;
+            padding: 0.5rem 1.25rem;
+            border-radius: 100px;
+            font-size: 0.7rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
 
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-thumb { background: var(--sdu-red); border-radius: 10px; }
-
-        /* Başarı Ekranı Stilleri */
-        #success-view {
-            display: none;
-            opacity: 0;
+        .data-notice {
+            background: rgba(59, 130, 246, 0.05);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            padding: 1.25rem;
+            border-radius: 1.5rem;
+            margin-top: 2rem;
         }
     </style>
 </head>
-<body class="pt-8">
+<body>
 
     <canvas id="bg-canvas"></canvas>
-    <div id="progress" class="fixed top-0 left-0 h-1 bg-red-600 z-[1100] w-0"></div>
 
-    <!-- Yukarı Kaydır Butonu -->
-    <button id="back-to-top" class="glass w-12 h-12 rounded-full flex items-center justify-center text-white hover:bg-red-600 transition-colors shadow-2xl">
-        <i data-lucide="chevron-up"></i>
-    </button>
-
-    <!-- Duyuru Şeridi -->
     <div class="announcement-bar fixed top-0 w-full flex items-center overflow-hidden">
-        <div class="marquee-content flex gap-24">
+        <div class="marquee-content">
             <span class="text-[9px] font-bold uppercase tracking-[0.2em] text-white flex items-center gap-2">
-                <i data-lucide="calendar" class="w-3 h-3 text-amber-400"></i> SON BAŞVURU: 14 MAYIS 2026
-            </span>
-            <span class="text-[9px] font-bold uppercase tracking-[0.2em] text-amber-200 flex items-center gap-2">
-                <i data-lucide="award" class="w-3 h-3"></i> TÜM BÖLÜMLER BAŞVURABİLİR
-            </span>
-            <span class="text-[9px] font-bold uppercase tracking-[0.2em] text-white flex items-center gap-2">
-                <i data-lucide="map" class="w-3 h-3 text-amber-400"></i> SDÜ KAMPÜSÜNDE BÜYÜK HEYECAN
+                <i data-lucide="info" class="w-3 h-3 text-red-400"></i> ÖNEMLİ DUYURU: ORYANTİRİNG YARIŞMASI 2026 İPTAL EDİLMİŞTİR. BAŞVURU ALIMI KAPALIDIR. SİSTEMLERİMİZDEKİ VERİLER SİLİNECEKTİR.
             </span>
         </div>
     </div>
 
-    <!-- Bildirim -->
-    <div id="notification" class="glass p-4 rounded-2xl border-l-4 min-w-[280px] shadow-2xl">
-        <div class="flex items-center gap-3">
-            <div id="notif-icon" class="w-10 h-10 rounded-xl flex items-center justify-center"></div>
-            <div>
-                <h4 id="notif-title" class="font-bold text-xs uppercase text-white tracking-tight"></h4>
-                <p id="notif-msg" class="text-[10px] text-slate-400 mt-0.5 leading-snug"></p>
-            </div>
+    <main class="cancellation-card glass shadow-2xl" id="notice-card">
+        <div class="logo-box mb-8">
+            <img src="https://r.resimlink.com/jJIpCL2HF4.png" alt="Oryantiring 2026" class="w-24 mx-auto grayscale opacity-50">
         </div>
-    </div>
 
-    <!-- ANA İÇERİK KONTEYNERI -->
-    <div id="main-content">
-        <!-- HERO -->
-        <section class="min-h-[90vh] flex flex-col items-center justify-center px-6 text-center">
-            <div class="mb-6 reveal-node" id="hero-logo-box" style="transform: translateY(20px);">
-                <img src="https://r.resimlink.com/jJIpCL2HF4.png" alt="Oryantiring 2026" class="w-28 md:w-40 mx-auto drop-shadow-[0_0_25px_rgba(155,28,49,0.4)]">
-            </div>
+        <div class="status-badge">
+            <i data-lucide="alert-triangle" class="w-4 h-4"></i> YARIŞMA İPTAL EDİLDİ
+        </div>
 
-            <div class="z-10 max-w-4xl">
-                <div id="hero-tag" class="inline-block px-4 py-1 rounded-full glass border border-white/10 mb-6 reveal-node">
-                    <span class="text-[9px] font-bold tracking-[0.3em] uppercase text-red-400">DOĞAYI KEŞFETMEYE HAZIR MISIN?</span>
+        <h1 class="text-3xl md:text-5xl font-black mb-6 tracking-tighter leading-tight text-white uppercase">
+            ÜZGÜNÜZ, <br> <span class="text-slate-500">VEDA EDİYORUZ.</span>
+        </h1>
+
+        <div class="space-y-6">
+            <p class="text-slate-400 text-sm md:text-base leading-relaxed font-medium">
+                Süleyman Demirel Üniversitesi Oryantiring Yarışması 2026, maalesef yeterli katılım sağlanamaması ve hakem heyetinden gelen istifalar sonucunda <strong>iptal edilmiştir.</strong>
+            </p>
+
+            <div class="data-notice">
+                <div class="flex items-center justify-center gap-2 mb-2">
+                    <i data-lucide="shield-check" class="w-4 h-4 text-blue-400"></i>
+                    <h4 class="text-blue-400 text-[10px] font-bold uppercase tracking-widest">Kişisel Verilerin Korunması</h4>
                 </div>
-
-                <h1 id="hero-title" class="text-4xl md:text-7xl font-black mb-6 tracking-tighter reveal-node leading-tight" style="transform: translateY(20px);">
-                    ORYANTİRİNG <span class="text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-amber-500">YARIŞMASI 2026</span>
-                </h1>
-
-                <p id="hero-desc" class="text-slate-400 text-sm md:text-lg max-w-2xl mx-auto mb-10 leading-relaxed reveal-node">
-                    Süleyman Demirel Üniversitesi'nde adrenalin ve zeka birleşiyor. <br class="hidden md:block">
-                    Bölüm fark etmeksizin tüm doğaseverler davetlidir. Ekibini kur, maceraya katıl!
+                <p class="text-slate-300 text-xs leading-relaxed">
+                    Kayıt yaptıran katılımcılarımızın tüm verileri, gizlilik politikamız gereği <span class="text-blue-400 font-bold">16 Mayıs itibariyle</span> tüm sistemlerimizden kalıcı olarak silinecektir.
                 </p>
-
-                <div id="hero-btns" class="flex flex-wrap items-center justify-center gap-4 reveal-node" style="transform: translateY(20px);">
-                    <a href="#kayit" class="btn-primary px-10 py-4 rounded-2xl font-bold text-xs uppercase tracking-widest text-white shadow-lg">BAŞVURU YAP</a>
-                    <a href="https://drive.google.com/file/d/1qJglHC2HL7pPERESImYu9lY_x01f2QkC/view?usp=sharing" target="_blank" class="glass px-10 py-4 rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-white/5 transition-all flex items-center gap-2 text-slate-300">
-                        <i data-lucide="file-text" class="w-4 h-4 text-red-500"></i> YÖNERGE
-                    </a>
-                </div>
-            </div>
-        </section>
-
-        <!-- MANTIK / NASIL OYNANIR -->
-        <section id="mantik" class="py-32 px-6 bg-black/20">
-            <div class="max-w-5xl mx-auto">
-                <div class="grid md:grid-cols-2 gap-16 items-center">
-                    <div class="reveal-node" id="logic-text" style="transform: translateY(30px);">
-                        <h2 class="text-2xl md:text-4xl font-black uppercase mb-6 leading-tight">DOĞA <span class="text-red-600">ZEKAYLA</span> BULUŞUYOR</h2>
-                        <p class="text-slate-400 text-sm leading-relaxed mb-8">
-                            Oryantiring, harita ve pusula yardımıyla hedef bulma sporudur. SDÜ 2026 Oryantiring Yarışması'nda sadece fiziksel hız değil, stratejik planlama ve ekip uyumu da kazanacak.
-                        </p>
-                        <div class="space-y-4">
-                            <div class="flex items-start gap-4 p-5 glass rounded-2xl border-l-4 border-red-600 shadow-sm">
-                                <i data-lucide="map" class="w-5 h-5 text-red-500 shrink-0"></i>
-                                <div>
-                                    <h4 class="text-xs font-bold text-white mb-1 uppercase tracking-wider">Navigasyon</h4>
-                                    <p class="text-[11px] text-slate-400">Dijital haritadaki koordinatları deşifre ederek ilerleyin.</p>
-                                </div>
-                            </div>
-                            <div class="flex items-start gap-4 p-5 glass rounded-2xl border-l-4 border-blue-500 shadow-sm">
-                                <i data-lucide="brain" class="w-5 h-5 text-blue-500 shrink-0"></i>
-                                <div>
-                                    <h4 class="text-xs font-bold text-white mb-1 uppercase tracking-wider">Problem Çözme</h4>
-                                    <p class="text-[11px] text-slate-400">Kontrol noktalarındaki bilmeceleri çözerek şifreyi tamamlayın.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-2 gap-4 reveal-node" id="logic-grid" style="transform: scale(0.95);">
-                        <div class="glass p-8 rounded-3xl text-center border-b-4 border-amber-500/50 hover:bg-amber-500/5 transition-all">
-                            <i data-lucide="clock" class="w-7 h-7 mx-auto mb-4 text-amber-500"></i>
-                            <span class="block text-[10px] font-bold uppercase text-white tracking-[0.2em]">HIZ</span>
-                        </div>
-                        <div class="glass p-8 rounded-3xl text-center border-b-4 border-emerald-500/50 hover:bg-emerald-500/5 transition-all">
-                            <i data-lucide="users" class="w-7 h-7 mx-auto mb-4 text-emerald-500"></i>
-                            <span class="block text-[10px] font-bold uppercase text-white tracking-[0.2em]">TAKIM</span>
-                        </div>
-                        <div class="glass p-8 rounded-3xl text-center border-b-4 border-red-500/50 hover:bg-red-500/5 transition-all">
-                            <i data-lucide="target" class="w-7 h-7 mx-auto mb-4 text-red-500"></i>
-                            <span class="block text-[10px] font-bold uppercase text-white tracking-[0.2em]">ODAK</span>
-                        </div>
-                        <div class="glass p-8 rounded-3xl text-center border-b-4 border-blue-500/50 hover:bg-blue-500/5 transition-all">
-                            <i data-lucide="compass" class="w-7 h-7 mx-auto mb-4 text-blue-500"></i>
-                            <span class="block text-[10px] font-bold uppercase text-white tracking-[0.2em]">YÖN</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- FORM -->
-        <section id="kayit" class="py-32 px-6">
-            <div class="max-w-4xl mx-auto">
-                <div class="text-center mb-16 reveal-node">
-                    <h2 class="text-4xl md:text-6xl font-black tracking-tight uppercase mb-4">BAŞVURU <span class="text-red-600">PANELİ</span></h2>
-                    <div class="flex items-center justify-center gap-4">
-                        <span class="h-px w-10 bg-slate-800"></span>
-                        <p class="text-slate-500 text-[11px] font-bold tracking-[0.4em] uppercase italic">Ekibini Kaydet (2-4 Kişi)</p>
-                        <span class="h-px w-10 bg-slate-800"></span>
-                    </div>
-                </div>
-
-                <form id="regForm" class="glass p-8 md:p-16 rounded-[3rem] border border-white/5 space-y-16 reveal-node shadow-2xl relative overflow-hidden">
-                    <div class="absolute -top-32 -right-32 w-64 h-64 bg-red-600/5 rounded-full blur-[100px]"></div>
-                    
-                    <!-- Takım Bilgisi -->
-                    <div class="space-y-6">
-                        <div class="flex items-center gap-4">
-                            <div class="w-10 h-10 bg-red-500/10 rounded-xl flex items-center justify-center text-red-500 border border-red-500/20">
-                                <i data-lucide="shield" class="w-5 h-5"></i>
-                            </div>
-                            <h3 class="text-sm font-black uppercase tracking-[0.2em] text-slate-300">TAKIM KİMLİĞİ</h3>
-                        </div>
-                        <div class="form-input-container">
-                            <input type="text" name="teamName" required placeholder="Takım İsminiz (Örn: Yıldızlar)" class="form-input text-2xl font-bold text-center py-5 rounded-2xl">
-                            <i data-lucide="flag" class="form-input-icon text-red-500/50"></i>
-                        </div>
-                    </div>
-
-                    <!-- Oyuncular -->
-                    <div id="membersWrapper" class="space-y-10">
-                        <div class="member-card leader glass p-8 rounded-[2rem] shadow-lg border-l-8 border-l-amber-500/50" data-index="0">
-                            <div class="flex items-center justify-between mb-8">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-8 h-8 rounded-lg bg-amber-500 flex items-center justify-center text-black shadow-lg shadow-amber-500/30">
-                                        <i data-lucide="crown" class="w-4 h-4"></i>
-                                    </div>
-                                    <span class="text-[11px] font-black text-white uppercase tracking-[0.2em]">TAKIM KAPTANI</span>
-                                </div>
-                            </div>
-                            
-                            <div class="grid md:grid-cols-2 gap-5">
-                                <div class="form-input-container">
-                                    <input type="text" name="m0_name" required placeholder="Ad Soyad" class="form-input">
-                                    <i data-lucide="user" class="form-input-icon"></i>
-                                </div>
-                                <div class="form-input-container">
-                                    <input type="email" name="m0_email" required placeholder="E-posta" class="form-input">
-                                    <i data-lucide="mail" class="form-input-icon"></i>
-                                </div>
-                                <div class="form-input-container">
-                                    <input type="text" name="m0_class" required placeholder="Sınıf (Örn: 2)" class="form-input">
-                                    <i data-lucide="hash" class="form-input-icon"></i>
-                                </div>
-                                <div class="form-input-container">
-                                    <input type="text" name="m0_dept" required placeholder="Bölüm" class="form-input">
-                                    <i data-lucide="graduation-cap" class="form-input-icon"></i>
-                                </div>
-                                <div class="form-input-container md:col-span-2">
-                                    <input type="tel" name="m0_phone" required placeholder="Telefon Numarası (05XX...)" class="form-input">
-                                    <i data-lucide="phone" class="form-input-icon"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Ekle Butonu -->
-                    <button type="button" id="addMemberBtn" class="w-full py-5 border-2 border-dashed border-white/10 rounded-2xl text-slate-500 hover:text-white hover:border-red-500/40 hover:bg-white/5 transition-all flex items-center justify-center gap-3 text-xs font-bold uppercase tracking-[0.2em]">
-                        <i data-lucide="plus-circle" class="w-5 h-5"></i> ÜYE EKLE (<span id="countSpan">1</span>/4)
-                    </button>
-
-                    <!-- Onaylar -->
-                    <div class="pt-10 border-t border-white/5">
-                        <label class="flex items-start gap-4 cursor-pointer group p-5 glass rounded-3xl hover:bg-white/5 transition-all border border-white/5 hover:border-white/10">
-                            <div class="relative flex items-center mt-1">
-                                <input type="checkbox" id="kvkkConsent" required class="custom-checkbox">
-                            </div>
-                            <span class="text-xs text-slate-400 leading-relaxed select-none">
-                                <a href="https://drive.google.com/file/d/1B743wlb1xI0cgOWa8sJ12spXviXz0u8E/view?usp=sharing" target="_blank" class="text-red-500 hover:underline font-bold transition-all underline-offset-4">KVKK Aydınlatma Metni</a>'ni ve 
-                                <a href="https://drive.google.com/file/d/1mEDVrxvToP1ZF7PQcYpgwpulFlmzSsh9/view?usp=sharing" target="_blank" class="text-red-500 hover:underline font-bold transition-all underline-offset-4">Gizlilik Sözleşmesi</a>'ni okudum, tüm yarışma kurallarını onaylıyorum.
-                            </span>
-                        </label>
-                    </div>
-
-                    <!-- Gönder -->
-                    <div class="text-center space-y-8">
-                        <div id="validationWarning" class="text-[10px] font-black text-red-500 uppercase tracking-widest opacity-0 transform translate-y-2 transition-all">
-                            <i data-lucide="alert-circle" class="w-4 h-4 inline-block mr-1"></i> Takım en az 2 kişiden oluşmalıdır!
-                        </div>
-                        <button type="submit" id="submitBtn" class="btn-primary w-full py-6 rounded-3xl font-black text-sm uppercase tracking-[0.4em] text-white flex items-center justify-center gap-4 shadow-2xl">
-                            KAYDI TAMAMLA VE GÖNDER <i data-lucide="send" class="w-5 h-5"></i>
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </section>
-    </div>
-
-    <!-- BAŞARI EKRANI (İLK ETAPTA GİZLİ) -->
-    <section id="success-view" class="min-h-screen flex items-center justify-center px-6 py-20">
-        <div class="max-w-2xl w-full text-center space-y-10">
-            <div class="relative inline-block">
-                <div class="w-24 h-24 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-8 animate-pulse">
-                    <i data-lucide="check-circle" class="w-12 h-12 text-emerald-500"></i>
-                </div>
-            </div>
-            
-            <div class="space-y-4">
-                <h2 class="text-4xl md:text-6xl font-black uppercase tracking-tighter">TEBRİKLER!</h2>
-                <p class="text-slate-400 text-lg md:text-xl font-medium">Kaydınız başarıyla tamamlandı. Artık efsanenin bir parçasısınız.</p>
             </div>
 
-            <div class="glass p-8 rounded-[2.5rem] border border-emerald-500/20 space-y-6">
-                <p class="text-xs font-bold uppercase tracking-widest text-emerald-400">Şimdi Ne Yapmalıyım?</p>
-                <div class="flex flex-col gap-4">
-                    <!-- WhatsApp Linki -->
-                    <a href="https://chat.whatsapp.com/D27M6wQwvzP5wh9eivOjJJ" target="_blank" class="flex items-center justify-center gap-3 bg-[#25D366] hover:bg-[#128C7E] text-white py-5 rounded-2xl font-black uppercase tracking-widest transition-all hover:scale-[1.02] shadow-xl">
-                        <i data-lucide="message-circle" class="w-5 h-5"></i> WHATSAPP GRUBUNA KATIL
-                    </a>
-                    <!-- Yönerge Linki -->
-                    <a href="https://drive.google.com/file/d/1qJglHC2HL7pPERESImYu9lY_x01f2QkC/view?usp=sharing" target="_blank" class="flex items-center justify-center gap-3 glass hover:bg-white/5 text-slate-300 py-5 rounded-2xl font-black uppercase tracking-widest transition-all">
-                        <i data-lucide="download" class="w-5 h-5 text-red-500"></i> YARIŞMA YÖNERGESİNİ İNDİR
-                    </a>
-                </div>
-                <p class="text-[10px] text-slate-500 italic">Yarışma ile ilgili tüm anlık duyurular WhatsApp grubu üzerinden yapılacaktır.</p>
-            </div>
-            
-            <button onclick="location.reload()" class="text-slate-600 hover:text-white text-xs font-bold uppercase tracking-widest transition-colors">Ana Sayfaya Dön</button>
+            <p class="text-slate-500 text-xs italic">
+                Gösterdiğiniz ilgi için teşekkür ederiz.
+            </p>
         </div>
-    </section>
 
-    <!-- FOOTER -->
-    <footer class="py-24 text-center border-t border-white/5 bg-black/40">
-        <div class="max-w-5xl mx-auto px-6">
-            <img src="https://r.resimlink.com/ICQnaWY.png" alt="SDÜ Oryantiring" class="w-40 md:w-56 mx-auto mb-12 transition-transform hover:scale-105 duration-700 drop-shadow-[0_0_30px_rgba(255,255,255,0.05)]">
-            <div class="text-[11px] font-black tracking-[0.6em] text-slate-500 uppercase leading-relaxed mb-6">
-                SDÜ EĞİTİM FAKÜLTESİ ORYANTİRİNG YARIŞMASI 2026
-            </div>
-            <div class="flex justify-center gap-6 text-slate-700">
-                <div class="h-px w-20 bg-slate-900 mt-2"></div>
-                <div class="text-[9px] uppercase tracking-widest font-bold">Her Hak Saklıdır &copy; 2026</div>
-                <div class="h-px w-20 bg-slate-900 mt-2"></div>
-            </div>
+        <div class="pt-10 mt-10 border-t border-white/5">
+            <h3 class="text-amber-500 font-bold uppercase tracking-widest text-xs mb-2">SENEYE TEKRAR GÖRÜŞMEK ÜZERE</h3>
+            <p class="text-[10px] text-slate-600 uppercase tracking-widest font-bold">SDÜ EĞİTİM FAKÜLTESİ ORYANTİRİNG EKİBİ</p>
         </div>
-    </footer>
+    </main>
 
     <script>
-        // Supabase Init
-        const SUPABASE_URL = 'https://hxdmiamcednlzoklkxnu.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_2lmWYp5Pkvn_BsADVHPKug_KK9n8v2-';
-        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-        // UI Helpers
-        function initIcons() { lucide.createIcons(); }
-        initIcons();
-
-        // GSAP Animations
-        gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
+        lucide.createIcons();
 
         window.onload = () => {
-            const tl = gsap.timeline();
-            tl.to("#hero-logo-box", { opacity: 1, y: 0, duration: 1, ease: "power4.out" })
-              .to("#hero-tag", { opacity: 1, duration: 0.6, ease: "power2.out" }, "-=0.6")
-              .to("#hero-title", { opacity: 1, y: 0, duration: 1, ease: "expo.out" }, "-=0.6")
-              .to("#hero-desc", { opacity: 1, duration: 0.6 }, "-=0.7")
-              .to("#hero-btns", { opacity: 1, y: 0, duration: 0.8, ease: "back.out(1.7)" }, "-=0.6");
-
-            // Scroll Reveal
-            document.querySelectorAll('.reveal-node').forEach(el => {
-                gsap.to(el, {
-                    scrollTrigger: {
-                        trigger: el,
-                        start: "top 90%",
-                        toggleActions: "play none none reverse"
-                    },
-                    opacity: 1,
-                    y: 0,
-                    scale: 1,
-                    duration: 0.8,
-                    ease: "power2.out"
-                });
+            gsap.to("#notice-card", {
+                opacity: 1,
+                y: 0,
+                duration: 1.2,
+                ease: "expo.out"
             });
-
-            // Back to Top functionality
-            const btt = document.getElementById('back-to-top');
-            window.addEventListener('scroll', () => {
-                if (window.scrollY > 500) btt.classList.add('visible');
-                else btt.classList.remove('visible');
-            });
-            btt.onclick = () => gsap.to(window, { scrollTo: 0, duration: 1, ease: "power3.inOut" });
         };
 
-        // Network Animation
         const canvas = document.getElementById('bg-canvas');
         const ctx = canvas.getContext('2d');
         let dots = [];
-        const dotCount = 100;
-        const connectionDist = 120;
+        const dotCount = 60;
 
         function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
         window.onresize = resize; resize();
@@ -484,9 +178,9 @@
             constructor() {
                 this.x = Math.random() * canvas.width;
                 this.y = Math.random() * canvas.height;
-                this.vx = (Math.random() - 0.5) * 0.4;
-                this.vy = (Math.random() - 0.5) * 0.4;
-                this.r = Math.random() * 1.5 + 0.5;
+                this.vx = (Math.random() - 0.5) * 0.15;
+                this.vy = (Math.random() - 0.5) * 0.15;
+                this.r = Math.random() * 1 + 0.5;
             }
             update() {
                 this.x += this.vx; this.y += this.vy;
@@ -494,7 +188,7 @@
                 if(this.y < 0 || this.y > canvas.height) this.vy *= -1;
             }
             draw() {
-                ctx.fillStyle = 'rgba(155, 28, 49, 0.4)';
+                ctx.fillStyle = 'rgba(71, 85, 105, 0.2)';
                 ctx.beginPath(); ctx.arc(this.x, this.y, this.r, 0, Math.PI*2); ctx.fill();
             }
         }
@@ -509,8 +203,8 @@
                     const dx = dots[i].x - dots[j].x;
                     const dy = dots[i].y - dots[j].y;
                     const dist = Math.sqrt(dx*dx + dy*dy);
-                    if(dist < connectionDist) {
-                        ctx.strokeStyle = `rgba(155, 28, 49, ${0.15 * (1 - dist/connectionDist)})`;
+                    if(dist < 150) {
+                        ctx.strokeStyle = `rgba(155, 28, 49, ${0.08 * (1 - dist/150)})`;
                         ctx.lineWidth = 0.5;
                         ctx.beginPath(); ctx.moveTo(dots[i].x, dots[i].y); ctx.lineTo(dots[j].x, dots[j].y); ctx.stroke();
                     }
@@ -519,140 +213,6 @@
             requestAnimationFrame(animate);
         }
         animate();
-
-        // Form Logic
-        const wrapper = document.getElementById('membersWrapper');
-        const countSpan = document.getElementById('countSpan');
-        const warning = document.getElementById('validationWarning');
-        const kvkk = document.getElementById('kvkkConsent');
-        let memberCount = 1;
-
-        document.getElementById('addMemberBtn').onclick = () => {
-            if(memberCount >= 4) return;
-            const div = document.createElement('div');
-            div.className = 'member-card glass p-8 rounded-[2rem] shadow-lg opacity-0 translate-y-4 scale-[0.98] border-l-8 border-l-slate-800';
-            div.dataset.index = memberCount;
-            div.innerHTML = `
-                <div class="flex items-center justify-between mb-8">
-                    <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center text-slate-400">
-                            <i data-lucide="user" class="w-4 h-4"></i>
-                        </div>
-                        <span class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">KATILIMCI ${memberCount+1}</span>
-                    </div>
-                    <button type="button" class="rmv p-1 text-slate-600 hover:text-red-500 transition-colors">
-                        <i data-lucide="trash-2" class="w-5 h-5"></i>
-                    </button>
-                </div>
-                <div class="grid md:grid-cols-2 gap-5">
-                    <div class="form-input-container">
-                        <input type="text" name="m${memberCount}_name" required placeholder="Ad Soyad" class="form-input">
-                        <i data-lucide="user" class="form-input-icon"></i>
-                    </div>
-                    <div class="form-input-container">
-                        <input type="email" name="m${memberCount}_email" required placeholder="E-posta" class="form-input">
-                        <i data-lucide="mail" class="form-input-icon"></i>
-                    </div>
-                    <div class="form-input-container">
-                        <input type="text" name="m${memberCount}_class" required placeholder="Sınıf" class="form-input">
-                        <i data-lucide="hash" class="form-input-icon"></i>
-                    </div>
-                    <div class="form-input-container">
-                        <input type="text" name="m${memberCount}_dept" required placeholder="Bölüm" class="form-input">
-                        <i data-lucide="graduation-cap" class="form-input-icon"></i>
-                    </div>
-                    <div class="form-input-container md:col-span-2">
-                        <input type="tel" name="m${memberCount}_phone" required placeholder="Telefon Numarası" class="form-input">
-                        <i data-lucide="phone" class="form-input-icon"></i>
-                    </div>
-                </div>
-            `;
-            wrapper.appendChild(div);
-            initIcons();
-            gsap.to(div, { opacity: 1, y: 0, scale: 1, duration: 0.5, ease: "back.out(1.2)" });
-            memberCount++;
-            updateUI();
-            div.querySelector('.rmv').onclick = () => {
-                gsap.to(div, { opacity: 0, scale: 0.95, duration: 0.3, onComplete: () => { div.remove(); memberCount--; updateUI(); } });
-            };
-        };
-
-        function updateUI() {
-            countSpan.innerText = memberCount;
-            if(memberCount < 2) {
-                warning.style.opacity = "1"; warning.style.transform = "translateY(0)";
-            } else {
-                warning.style.opacity = "0"; warning.style.transform = "translateY(5px)";
-            }
-        }
-        updateUI();
-
-        function notify(t, m, type='success') {
-            const n = document.getElementById('notification');
-            const icon = document.getElementById('notif-icon');
-            n.className = `glass p-4 rounded-2xl border-l-4 min-w-[280px] shadow-2xl show ${type==='success'?'border-emerald-500':'border-red-500'}`;
-            icon.className = `w-10 h-10 rounded-xl flex items-center justify-center ${type==='success'?'bg-emerald-500/10 text-emerald-500':'bg-red-500/10 text-red-500'}`;
-            icon.innerHTML = `<i data-lucide="${type==='success'?'check-circle':'alert-circle'}"></i>`;
-            document.getElementById('notif-title').innerText = t;
-            document.getElementById('notif-msg').innerText = m;
-            initIcons();
-            setTimeout(()=>n.classList.remove('show'), 5000);
-        }
-
-        function showSuccessView() {
-            const main = document.getElementById('main-content');
-            const success = document.getElementById('success-view');
-            
-            gsap.to(main, { opacity: 0, duration: 0.6, onComplete: () => {
-                main.style.display = 'none';
-                success.style.display = 'flex';
-                gsap.to(success, { opacity: 1, y: 0, duration: 1, ease: "power4.out" });
-                initIcons();
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            }});
-        }
-
-        document.getElementById('regForm').onsubmit = async (e) => {
-            e.preventDefault();
-            if(memberCount < 2) { notify("Kadro Eksik", "Yarışma kuralları gereği ekibiniz en az 2 kişiden oluşmalıdır.", "error"); return; }
-            if(!kvkk.checked) { notify("Onay Gerekli", "Lütfen KVKK ve Gizlilik Sözleşmesi'ni onaylayın.", "error"); return; }
-            
-            const btn = document.getElementById('submitBtn');
-            const orig = btn.innerHTML;
-            btn.disabled = true; 
-            btn.innerHTML = `<div class="flex items-center gap-2"><div class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div> GÖNDERİLİYOR...</div>`;
-
-            const fd = new FormData(e.target);
-            const members = [];
-            document.querySelectorAll('.member-card').forEach(c => {
-                const i = c.dataset.index;
-                members.push({
-                    name: fd.get(`m${i}_name`),
-                    email: fd.get(`m${i}_email`),
-                    class: fd.get(`m${i}_class`),
-                    dept: fd.get(`m${i}_dept`),
-                    phone: fd.get(`m${i}_phone`),
-                    is_leader: i === "0"
-                });
-            });
-
-            try {
-                const { error } = await supabaseClient.from('registrations').insert([{ team_name: fd.get('teamName'), members, created_at: new Date().toISOString() }]);
-                if(error) throw error;
-                
-                // Formu temizle ve başarı ekranını göster
-                showSuccessView();
-                
-            } catch(err) {
-                notify("Bağlantı Hatası", "Veriler gönderilemedi. Lütfen tekrar deneyin.", "error");
-                btn.disabled = false; btn.innerHTML = orig; initIcons();
-            }
-        };
-
-        window.onscroll = () => {
-            const s = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
-            document.getElementById('progress').style.width = s + '%';
-        };
     </script>
 </body>
 </html>
